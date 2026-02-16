@@ -6,7 +6,7 @@ import type { TailwindConfigInput } from "./util/tailwindTypes";
 
 export interface ESLintPluginTailwindOptions {
   /** These are the default values but feel free to customize */
-  readonly callees?: Array<"classnames" | "clsx" | "ctl" | (string & {})>;
+  readonly callees?: Array<"classnames" | "clsx" | "ctl" | "cva" | (string & {})>;
   /** returned from `loadConfig()` utility if not provided */
   readonly config?: TailwindConfigInput;
   readonly cssFiles?: Array<
@@ -17,9 +17,10 @@ export interface ESLintPluginTailwindOptions {
   readonly skipClassAttribute?: boolean;
   readonly whitelist?: string[];
   /** can be set to e.g. ['tw'] for use in tw`bg-blue` */
-  readonly tags?: string[];
+  readonly tags?: Array<"tw" | (string & {})>;
   /* can be modified to support custom attributes. E.g. "^tw$" for `twin.macro` */
   readonly classRegex?: string;
+  readonly ignoredKeys?: string[];
 }
 
 export type ArgNode =
@@ -38,52 +39,38 @@ export type ArgNode =
 export function extractTagName(tag: Rule.Node | ES.Expression): string | undefined {
   if (tag.type === "Identifier") {
     return tag.name;
-  }
-  if (tag.type === "MemberExpression" && tag.object.type === "Identifier") {
+  } else if (tag.type === "MemberExpression" && tag.object.type === "Identifier") {
     return tag.object.name;
-  }
-  if (tag.type === "CallExpression" && tag.callee.type === "Identifier") {
+  } else if (tag.type === "CallExpression" && tag.callee.type === "Identifier") {
     return tag.callee.name;
   }
   return;
 }
 
-export function getTaggedTemplateExpressionName(node: ES.TaggedTemplateExpression) {
-  return extractTagName(node.tag);
-}
-
 // #region schema
-const callees = {
-  type: "array",
-  items: { type: "string", minLength: 0 },
-  uniqueItems: true,
-} as const;
-
-const ignoredKeys = {
-  type: "array",
-  items: { type: "string", minLength: 0 },
-  uniqueItems: true,
-} as const;
-
-const config = {
-  type: ["string", "object"],
-} as const;
-
 export const removeDuplicates = {
   // default: true,
   type: "boolean",
 } as const;
 
-const tags = {
-  type: "array",
-  items: { type: "string", minLength: 0 },
-  uniqueItems: true,
-} as const;
-
 export const sharedSchema = {
-  callees,
-  ignoredKeys,
-  config,
-  tags,
+  callees: {
+    type: "array",
+    items: { type: "string", minLength: 0 },
+    uniqueItems: true,
+  },
+  ignoredKeys: {
+    type: "array",
+    items: { type: "string", minLength: 0 },
+    uniqueItems: true,
+  },
+  config: {
+    type: ["string", "object"],
+  },
+  tags: {
+    type: "array",
+    items: { type: "string", minLength: 0 },
+    uniqueItems: true,
+  },
 } as const;
 // #endregion

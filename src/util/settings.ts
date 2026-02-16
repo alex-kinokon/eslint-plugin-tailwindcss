@@ -1,22 +1,8 @@
 import type { Rule } from "eslint";
 
-import type { TailwindConfigInput } from "./tailwindTypes.ts";
+import type { ESLintPluginTailwindOptions } from "../types.ts";
 
-interface OptionValueMap {
-  callees: string[];
-  ignoredKeys: string[];
-  classRegex: string;
-  config: TailwindConfigInput;
-  cssFiles: string[];
-  cssFilesRefreshRate: number;
-  removeDuplicates: boolean;
-  skipClassAttribute: boolean;
-  tags: string[];
-  whitelist: string[];
-}
-
-type OptionName = keyof OptionValueMap;
-
+type OptionValueMap = Required<ESLintPluginTailwindOptions>;
 type SettingsTailwind = Partial<OptionValueMap> & Record<string, unknown>;
 
 type ContextLike = Rule.RuleContext & {
@@ -52,48 +38,29 @@ export function getOptions(context: ContextLike) {
   };
 }
 
-function getOption<K extends OptionName>(
+const defaultOptions: OptionValueMap = {
+  callees: ["classnames", "clsx", "ctl", "cva", "tv"],
+  ignoredKeys: ["compoundVariants", "defaultVariants"],
+  classRegex: "^class(Name)?$",
+  config: {},
+  cssFiles: ["**/*.css", "!**/node_modules", "!**/.*", "!**/dist", "!**/build"],
+  cssFilesRefreshRate: 5_000,
+  removeDuplicates: true,
+  skipClassAttribute: false,
+  tags: [],
+  whitelist: [],
+};
+
+function getOption<K extends keyof OptionValueMap>(
   context: ContextLike,
   name: K
 ): OptionValueMap[K] {
-  // Options (defined at rule level)
-  const options = context.options[0] ?? {};
-  const optionValue = options[name];
-  if (optionValue !== undefined) {
-    return optionValue as OptionValueMap[K];
-  }
-  // Settings (defined at plugin level, shared across rules)
-  const settingValue = context.settings.tailwindcss?.[name];
-  if (settingValue !== undefined) {
-    return settingValue as OptionValueMap[K];
-  }
-  // Fallback to defaults
-  switch (name) {
-    case "callees":
-      return ["classnames", "clsx", "ctl", "cva", "tv"] as OptionValueMap[K];
-    case "ignoredKeys":
-      return ["compoundVariants", "defaultVariants"] as OptionValueMap[K];
-    case "classRegex":
-      return "^class(Name)?$" as OptionValueMap[K];
-    case "config":
-      return {} as OptionValueMap[K];
-    case "cssFiles":
-      return [
-        "**/*.css",
-        "!**/node_modules",
-        "!**/.*",
-        "!**/dist",
-        "!**/build",
-      ] as OptionValueMap[K];
-    case "cssFilesRefreshRate":
-      return 5_000 as OptionValueMap[K];
-    case "removeDuplicates":
-      return true as OptionValueMap[K];
-    case "skipClassAttribute":
-      return false as OptionValueMap[K];
-    case "tags":
-      return [] as unknown as OptionValueMap[K];
-    case "whitelist":
-      return [] as unknown as OptionValueMap[K];
-  }
+  return (
+    // Options (defined at rule level)
+    (context.options[0] ?? {})[name] ??
+    // Settings (defined at plugin level, shared across rules)
+    context.settings.tailwindcss?.[name] ??
+    // Fallback to defaults
+    defaultOptions[name]
+  );
 }

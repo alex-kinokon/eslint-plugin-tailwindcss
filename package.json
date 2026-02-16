@@ -2,7 +2,6 @@
   "name": "@aet/eslint-plugin-tailwindcss",
   "type": "module",
   "version": "0.0.1",
-  "private": true,
   "description": "Rules enforcing best practices while using Tailwind CSS",
   "author": "François Massart",
   "license": "MIT",
@@ -18,6 +17,9 @@
     "eslint-plugin",
     "tailwind",
     "tailwindcss"
+  ],
+  "files": [
+    "lib"
   ],
   "main": "./lib/index.js",
   "scripts": {

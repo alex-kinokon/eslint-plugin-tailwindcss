@@ -3,6 +3,9 @@
   "compilerOptions": {
     "rootDir": "src",
     "allowImportingTsExtensions": false,
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true,
     "rewriteRelativeImportExtensions": true,
     "noEmit": false,
     "outDir": "lib",

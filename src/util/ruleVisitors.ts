@@ -1,7 +1,7 @@
 import type { Rule } from "eslint";
 
 import type { ArgNode } from "../types.ts";
-import { getTaggedTemplateExpressionName } from "../types.ts";
+import { extractTagName } from "../types.ts";
 
 import {
   calleeToString,
@@ -50,7 +50,7 @@ export function createClassnameVisitors({
       }
     },
     TaggedTemplateExpression(node): void {
-      const name = getTaggedTemplateExpressionName(node);
+      const name = extractTagName(node.tag);
       if (name && !tags.includes(name)) {
         return;
       }
