@@ -1,4 +1,7 @@
 {
-  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "eslint.runtime": "node",
+  "cSpell.words": [
+    "Massart"
+  ],
   "editor.formatOnSave": true
 }

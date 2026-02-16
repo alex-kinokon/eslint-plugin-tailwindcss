@@ -1,0 +1,8 @@
+@plugin "@tailwindcss/typography";
+@plugin "@tailwindcss/forms";
+@plugin "@tailwindcss/aspect-ratio";
+
+@theme {
+  --text-large: 20rem;
+  --color-deque-blue: #243c5a;
+}
